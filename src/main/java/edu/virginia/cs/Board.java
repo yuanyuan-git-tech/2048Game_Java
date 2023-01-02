@@ -2,21 +2,24 @@ package edu.virginia.cs;
 
 import java.util.Random;
 
-public class Board implements GameMode{
+public class Board implements GameMode {
     int[][] board;
     int sumOfScore;
     int numOfTile;
+    static final int BOARD_SIZE = 4;
 
     public Board() {
-        board = new int[4][4];
+        board = new int[BOARD_SIZE][BOARD_SIZE];
         sumOfScore = 0;
         numOfTile = 0;
     }
 
     public boolean isGameOver() {
-        if (getSize() != 16) {
-            return true;
+        // No free spaces remain
+        if (getSize() != board.length * board.length) {
+            return false;
         }
+        // No shift would merge any tiles
         for (int i = 1; i < board.length; i++) {
             for (int j = 1; j < board.length; j++) {
                 if (board[i][j] == board[i - 1][j] || board[i][j] == board[i][j - 1]) return false;
@@ -32,7 +35,7 @@ public class Board implements GameMode{
 
     @Override
     public int getData(int x, int y) throws ArrayIndexOutOfBoundsException {
-        if (x < 0 || x >= 4 || y < 0 || y >= 4) throw new ArrayIndexOutOfBoundsException();
+        if (x < 0 || x >= board.length || y < 0 || y >= board[0].length) throw new ArrayIndexOutOfBoundsException();
         return board[x][y];
     }
 
@@ -49,44 +52,89 @@ public class Board implements GameMode{
     }
 
     private void moveRight() {
-        boolean canMove = false;
-
-        if (canMove) generateNewCube();
+        boolean changed = false;
+        if (changed) generateNewCube();
     }
 
-    private void moveDown() {
-        boolean canMove = false;
 
-        if (canMove) generateNewCube();
+    private void moveDown() {
+        boolean changed = false;
+        for (int j = 0; j < board[0].length; j++) {
+            // 1. merge the same tile
+            int i = board.length - 1;
+            while (i >= 0) {
+                if (board[i][j] != 0) {
+                    int next = i - 1;
+                    while (next >= 0 && board[next][j] == 0) {
+                        next++;
+                    }
+                    if (next >= 0 && board[i][j] == board[next][j]) {
+                        board[i][j] += board[next][j];
+                        sumOfScore += board[i][j];
+                        board[next][j] = 0;
+                        i = next - 1;
+                        changed = true;
+                    } else i--;
+                } else {
+                    i--;
+                }
+            }
+            // 2. no empty space between two tiles
+            int row = board.length - 1;;
+            while (row >= 0) {
+                int nonEmptyTile = row;
+                while (nonEmptyTile >= 0 && board[nonEmptyTile][j] == 0) nonEmptyTile++;
+                if (nonEmptyTile >= 0 && board[nonEmptyTile][j] != 0) {
+                    board[row][j] = board[nonEmptyTile][j];
+                    board[nonEmptyTile][j]++;
+                    changed = true;
+                }
+                row--;
+            }
+        }
+        if (changed) generateNewCube();
     }
 
     private void moveUp() {
-        boolean canMove = false;
-
-        if (canMove) generateNewCube();
+        boolean changed = false;
+        for (int j = 0; j < board[0].length; j++) {
+            // 1. merge the same tile
+            int i = 0;
+            while (i < board.length - 1) {
+                if (board[i][j] != 0) {
+                    int next = i + 1;
+                    while (next < board.length && board[next][j] == 0) {
+                        next++;
+                    }
+                    if (next < board.length && board[i][j] == board[next][j]) {
+                        board[i][j] += board[next][j];
+                        sumOfScore += board[i][j];
+                        board[next][j] = 0;
+                        i = next + 1;
+                        changed = true;
+                    } else i++;
+                } else {
+                    i++;
+                }
+            }
+            // 2. no empty space between two tiles
+            int row = 0;
+            while (row < board.length) {
+                int nonEmptyTile = row;
+                while (nonEmptyTile <  board.length && board[nonEmptyTile][j] == 0) nonEmptyTile++;
+                if (nonEmptyTile < board.length && board[nonEmptyTile][j] != 0) {
+                    board[row][j] = board[nonEmptyTile][j];
+                    board[nonEmptyTile][j]++;
+                    changed = true;
+                }
+                row++;
+            }
+        }
+        if (changed) generateNewCube();
     }
 
     private void moveLeft() {
-        boolean canMove = false;
-//        for (int row = 0; row < 4; row++) {
-//            int col = board.length - 1;
-//            while (col >= 0 && board[row][col] == 0) {
-//                col--;
-//            }
-//            if (col < 0 || col - 1 < 0) continue;
-//            if (board[row][col - 1] == board[row][col]) {
-//                sumOfScore += 2 * board[row][col];
-//                board[row][col - 1] = 2 * board[row][col];
-//                board[row][col] = 0;
-//                numOfTile--;
-//                canMove = true;
-//            } else if (board[row][col - 1] == 0) {
-//                board[row][board.length - 1] = board[row][col];
-//                board[row][col] = 0;
-//                canMove = true;
-//            }
-//        }
-        if (canMove) generateNewCube();
+
     }
 
     @Override

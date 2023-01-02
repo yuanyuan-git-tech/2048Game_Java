@@ -6,6 +6,10 @@ public class GameManager {
     Board gameBoard;
     Scanner scanner = new Scanner(System.in);
 
+    public static void main(String[] args) {
+        GameManager start = new GameManager();
+        start.play();
+    }
 
     public void play() {
         initializeBoard();
@@ -26,8 +30,9 @@ public class GameManager {
                 }
             }
             gameBoard.move(moveDirection);
-            System.out.println(gameBoard.getScore());
+            System.out.println("Score: " + gameBoard.getScore());
         }
+        System.out.println("Game is Over! You get the max number: " + gameBoard.getMaxCubeNumber());
     }
     private void initializeBoard() {
         gameBoard.generateNewCube();
