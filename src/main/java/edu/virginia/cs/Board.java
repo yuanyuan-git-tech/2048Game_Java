@@ -3,9 +3,9 @@ package edu.virginia.cs;
 import java.util.Random;
 
 public class Board implements GameMode {
-    int[][] board;
-    int sumOfScore;
-    int numOfTile;
+    private int[][] board;
+    private int sumOfScore;
+    private int numOfTile;
     static final int BOARD_SIZE = 4;
 
     public Board() {
@@ -51,12 +51,6 @@ public class Board implements GameMode {
         return true;
     }
 
-    private void moveRight() {
-        boolean changed = false;
-        if (changed) generateNewCube();
-    }
-
-
     private void moveDown() {
         boolean changed = false;
         for (int j = 0; j < board[0].length; j++) {
@@ -80,13 +74,13 @@ public class Board implements GameMode {
                 }
             }
             // 2. no empty space between two tiles
-            int row = board.length - 1;;
+            int row = board.length - 1;
             while (row >= 0) {
                 int nonEmptyTile = row;
                 while (nonEmptyTile >= 0 && board[nonEmptyTile][j] == 0) nonEmptyTile++;
                 if (nonEmptyTile >= 0 && board[nonEmptyTile][j] != 0) {
                     board[row][j] = board[nonEmptyTile][j];
-                    board[nonEmptyTile][j]++;
+                    board[nonEmptyTile][j] = 0;
                     changed = true;
                 }
                 row--;
@@ -124,7 +118,7 @@ public class Board implements GameMode {
                 while (nonEmptyTile <  board.length && board[nonEmptyTile][j] == 0) nonEmptyTile++;
                 if (nonEmptyTile < board.length && board[nonEmptyTile][j] != 0) {
                     board[row][j] = board[nonEmptyTile][j];
-                    board[nonEmptyTile][j]++;
+                    board[nonEmptyTile][j] = 0;
                     changed = true;
                 }
                 row++;
@@ -133,8 +127,75 @@ public class Board implements GameMode {
         if (changed) generateNewCube();
     }
 
+    private void moveRight() {
+        boolean changed = false;
+        for (int i = 0; i < board.length; i++) {
+            int j = board[0].length - 1;
+            while (j >= 0) {
+                if (board[i][j] != 0) {
+                    int next = j - 1;
+                    while (next >= 0 && board[i][next] == 0) {
+                        next--;
+                    }
+                    if (next >= 0 && board[i][j] == board[i][next]) {
+                        board[i][j] += board[i][next];
+                        sumOfScore += board[i][j];
+                        board[i][next] = 0;
+                        i = next - 1;
+                        changed = true;
+                    } else {
+                        j--;
+                    }
+                } else j--;
+            }
+            int col = board[0].length - 1;
+            while (col >= 0) {
+                int nonEmptyTile = col;
+                while (nonEmptyTile >= 0 && board[i][nonEmptyTile] == 0) nonEmptyTile--;
+                if (nonEmptyTile >= 0 && board[i][nonEmptyTile] != 0) {
+                    board[i][col] = board[i][nonEmptyTile];
+                    board[i][nonEmptyTile] = 0;
+                    changed = true;
+                }
+                col--;
+            }
+        }
+        if (changed) generateNewCube();
+    }
     private void moveLeft() {
-
+        boolean changed = false;
+        for (int i = 0; i < board.length; i++) {
+            int j = 0;
+            while (j < board[0].length) {
+                if (board[i][j] != 0) {
+                    int next = j + 1;
+                    while (next < board[0].length && board[i][next] == 0) {
+                        next++;
+                    }
+                    if (next < board[0].length && board[i][j] == board[i][next]) {
+                        board[i][j] += board[i][next];
+                        sumOfScore += board[i][j];
+                        board[i][next] = 0;
+                        i = next + 1;
+                        changed = true;
+                    } else {
+                        j++;
+                    }
+                } else j++;
+            }
+            int col = 0;
+            while (col < board[0].length) {
+                int nonEmptyTile = col;
+                while (nonEmptyTile < board[0].length && board[i][nonEmptyTile] == 0) nonEmptyTile++;
+                if (nonEmptyTile < board[0].length && board[i][nonEmptyTile] != 0) {
+                    board[i][col] = board[i][nonEmptyTile];
+                    board[i][nonEmptyTile] = 0;
+                    changed = true;
+                }
+                col++;
+            }
+        }
+        if (changed) generateNewCube();
     }
 
     @Override
